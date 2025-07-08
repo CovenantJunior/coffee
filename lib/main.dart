@@ -29,11 +29,11 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
   int quantity = 1;
 
   final Map<String, double> sizeToCupSize = {
-    'Small': 40.0,
-    'Medium': 50.0,
-    'Large': 60.0,
-    'XLarge': 70.0,
-    'Custom': 80.0,
+    'Small': 60.0,
+    'Medium': 75.0,
+    'Large': 90.0,
+    'XLarge': 105.0,
+    'Custom': 120.0,
   };
 
   final Map<String, double> sizeToPrice = {
@@ -93,7 +93,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
                 Positioned(
                   bottom: 185,
                   child: SizedBox(
-                  height: 80,
+                  height: cupSize,
                   width: 200,
                   child: PageView.builder(
                     itemCount: 3,
