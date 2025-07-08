@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:liquid_progress_indicator_v2/liquid_progress_indicator.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,6 +30,8 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
   String selectedSize = 'Large';
   double cupSize = 60.0;
   int quantity = 1;
+  bool filling = false;
+  double _progress = 0.0;
 
   final Map<String, double> sizeToCupSize = {
     'Small': 60.0,
@@ -45,7 +50,22 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
   };
 
   void fillUpCup() {
-
+    setState(() {
+      filling = true;
+      Future.delayed(const Duration(seconds: 10), () {
+        setState(() {
+          filling = false;
+        });
+      });
+      Timer.periodic(const Duration(milliseconds: 100), (timer) {
+        setState(() {
+          _progress += 0.01;
+          if (_progress >= 1.0) {
+            _progress = 0.0;
+          }
+        });
+      });
+    });
   }
 
   @override
@@ -186,12 +206,12 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
                   },
                 ),
                 Expanded(
-                  child: ElevatedButton(
+                  child: !filling ? ElevatedButton(
                     onPressed: () {
                       fillUpCup();
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
+                      backgroundColor: Colors.brown,
                       minimumSize: const Size(double.infinity, 50),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -205,8 +225,28 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
                         fontFamily: 'Quicksand',
                         color: Colors.white,
                       ),
+                    )
+                  ) : LiquidLinearProgressIndicator(
+                      value: 0.5,
+                      valueColor: const AlwaysStoppedAnimation(Colors.brown),
+                      backgroundColor: Colors.white,
+                      borderColor: Colors.brown,
+                      borderWidth: 5.0,
+                      borderRadius: 12.0,
+                      direction: Axis.vertical,
+                      center: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: const Text(
+                          "Filling your cup",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Quicksand',
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
                 ),
               ],
             ),
@@ -230,21 +270,21 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
           Container(
             decoration: BoxDecoration(
               color: isSelected
-                  ? Colors.green.withOpacity(0.3)
+                  ? Colors.brown.withOpacity(0.3)
                   : Colors.grey.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             padding: const EdgeInsets.all(8.0),
             child: Icon(
               Icons.local_drink,
-              color: isSelected ? Colors.green : Colors.black54,
+              color: isSelected ? Colors.brown : Colors.black54,
             ),
           ),
           const SizedBox(height: 5),
           Text(
             size,
             style: TextStyle(
-              color: isSelected ? Colors.green : Colors.black,
+              color: isSelected ? Colors.brown : Colors.black,
               fontWeight: FontWeight.bold,
               fontFamily: 'Quicksand',
             ),
