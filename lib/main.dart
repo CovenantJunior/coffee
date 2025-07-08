@@ -37,11 +37,11 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
   };
 
   final Map<String, double> sizeToPrice = {
-    'Small': 25.0,
-    'Medium': 27.0,
-    'Large': 30.0,
-    'XLarge': 35.0,
-    'Custom': 40.0,
+    'Small': 3.50,
+    'Medium': 4.25,
+    'Large': 5.00,
+    'XLarge': 5.75,
+    'Custom': 6.50,
   };
 
   @override
@@ -81,11 +81,36 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
-            Center(
-              child: Image.asset(
-                'images/coffee_machine.png',
-                height: 500,
-              ),
+            Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                Center(
+                  child: Image.asset(
+                    'images/coffee_machine.png',
+                    height: 500,
+                  ),
+                ),
+                Positioned(
+                  bottom: 185,
+                  child: SizedBox(
+                  height: 80,
+                  width: 200,
+                  child: PageView.builder(
+                    itemCount: 3,
+                    controller: PageController(viewportFraction: 0.7),
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        child: Image.asset(
+                        'images/cup${index + 1}.png',
+                        height: 80,
+                        ),
+                      );
+                    },
+                  ),
+                  ),
+                )
+              ]
             ),
             const SizedBox(height: 20),
             Padding(
