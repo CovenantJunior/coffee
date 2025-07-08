@@ -76,12 +76,6 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
       _progress = 0.0;
       quantity = 1;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Added $quantity $selectedSize Caramel Frappuccino to your order!'),
-        duration: const Duration(seconds: 2),
-      ),
-    );
   }
 
   @override
@@ -316,6 +310,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
     bool isSelected = selectedSize == size;
     return GestureDetector(
       onTap: () {
+        if (filling || filled) return;
         setState(() {
           selectedSize = size;
           cupSize = sizeToCupSize[size]!;
