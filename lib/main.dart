@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:liquid_progress_indicator_v2/liquid_progress_indicator.dart';
+import 'package:lottie/lottie.dart';
 
 void main() {
   runApp(const MyApp());
@@ -109,9 +110,38 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
           onPressed: () {},
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.coffee_outlined),
-            onPressed: () {},
+          Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.coffee_outlined),
+                onPressed: () {},
+              ),
+              orders > 0 ? Positioned(
+                right: 10,
+                top: 3,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    color: Colors.brown, // Red background for the badge
+                    shape: BoxShape.circle,
+                  ),
+                  constraints: const BoxConstraints(
+                    minWidth: 16,
+                    minHeight: 16,
+                  ),
+                  child: Text(
+                    orders.toString(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontFamily: 'Quicksand',
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )
+              ): const SizedBox()
+            ]
           ),
         ],
       ),
@@ -123,7 +153,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
           children: [
             const SizedBox(height: 20),
             Stack(
-              alignment: Alignment.bottomCenter,
+              alignment: Alignment.center,
               children: [
                 Center(
                   child: Image.asset(
@@ -131,6 +161,19 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
                     height: 500,
                   ),
                 ),
+                filling ? Positioned(
+                  bottom: 240,
+                  child: Transform.rotate(
+                    angle: -270 * 3.14159 / 180,
+                    child: LottieBuilder.asset(
+                      'lotties/faucet.json',
+                      height: 3,
+                      // width: 20,
+                      repeat: true,
+                      animate: true,
+                    ),
+                  ),
+                ) : const SizedBox(),
                 Positioned(
                   bottom: 185,
                   child: AnimatedContainer(
@@ -152,7 +195,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
                       },
                     ),
                   ),
-                )
+                ),
               ],
             ),
             const SizedBox(height: 20),
@@ -161,11 +204,14 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Size Options',
+                  const Text(
+                      'Size Options',
                       style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Quicksand')),
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Quicksand'
+                    )
+                  ),
                   RichText(
                     text: TextSpan(
                       style: const TextStyle(
