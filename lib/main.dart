@@ -44,6 +44,10 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
     'Custom': 6.50,
   };
 
+  void fillUpCup() {
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +57,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
         title: const Text(
           'Caramel Frappuccino',
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
             fontFamily: 'Quicksand',
             color: Colors.black,
@@ -92,22 +96,24 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
                 ),
                 Positioned(
                   bottom: 185,
-                  child: SizedBox(
-                  height: cupSize,
-                  width: 200,
-                  child: PageView.builder(
-                    itemCount: 3,
-                    controller: PageController(viewportFraction: 0.7),
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                        child: Image.asset(
-                        'images/cup${index + 1}.png',
-                        height: 80,
-                        ),
-                      );
-                    },
-                  ),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.easeInOut,
+                      height: cupSize,
+                      width: 200,
+                      child: PageView.builder(
+                        itemCount: 3,
+                        controller: PageController(viewportFraction: 0.7),
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                            child: Image.asset(
+                            'images/cup${index + 1}.png',
+                            height: 80,
+                            ),
+                          );
+                      },
+                    ),
                   ),
                 )
               ]
@@ -181,7 +187,9 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
                 ),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      fillUpCup();
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       minimumSize: const Size(double.infinity, 50),
