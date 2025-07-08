@@ -88,19 +88,39 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            const Row(
-              children: [
-                Text('Size Options', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Quicksand')),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Center(
-              child: Text(
-                '\$${sizeToPrice[selectedSize]!.toStringAsFixed(2)}',
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, fontFamily: 'Quicksand'),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Size Options', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Quicksand')),
+                  RichText(
+                  text: TextSpan(
+                    style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Quicksand',
+                    color: Colors.black,
+                    ),
+                    children: [
+                    TextSpan(
+                      text: '\$${sizeToPrice[selectedSize]!.floor()}',
+                    ),
+                    TextSpan(
+                      text: '.${(sizeToPrice[selectedSize]! % 1).toStringAsFixed(2).substring(2)}',
+                      style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Quicksand',
+                      ),
+                    ),
+                    ],
+                  ),
+                  ),
+                ],
               ),
             ),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -111,7 +131,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
                 _buildSizeButton('Custom'),
               ],
             ),
-            const Spacer(),
+            const SizedBox(height: 20),
             Row(
               children: [
                 IconButton(
@@ -124,7 +144,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
                 ),
                 Text(
                   '$quantity',
-                  style: const TextStyle(fontSize: 18, fontFamily: 'Quicksand'),
+                  style: const TextStyle(fontSize: 18, fontFamily: 'Quicksand', fontWeight: FontWeight.bold),
                 ),
                 IconButton(
                   icon: const Icon(Icons.add),
@@ -134,7 +154,6 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
                     });
                   },
                 ),
-                const Spacer(),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {},
