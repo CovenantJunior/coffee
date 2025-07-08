@@ -29,6 +29,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
   String selectedSize = 'Large';
   double cupSize = 60.0;
   int quantity = 1;
+  int orders = 0;
   bool filling = false;
   bool filled = false;
   double _progress = 0.0;
@@ -74,7 +75,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
       filling = false;
       filled = false;
       _progress = 0.0;
-      quantity = 1;
+      orders +=1;
     });
   }
 
