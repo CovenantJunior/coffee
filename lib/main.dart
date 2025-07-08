@@ -310,7 +310,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
     bool isSelected = selectedSize == size;
     return GestureDetector(
       onTap: () {
-        if (filling || filled) return;
+        if (filling) return;
         setState(() {
           selectedSize = size;
           cupSize = sizeToCupSize[size]!;
