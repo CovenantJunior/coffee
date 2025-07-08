@@ -229,7 +229,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
             padding: const EdgeInsets.all(8.0),
             child: Icon(
               Icons.local_drink,
-              color: isSelected ? Colors.green : Colors.grey,
+              color: isSelected ? Colors.green : Colors.black54,
             ),
           ),
           const SizedBox(height: 5),
