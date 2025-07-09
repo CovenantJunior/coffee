@@ -48,11 +48,11 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
 
 
   final Map<String, double> sizeToCupSize = {
-    'Small': 60.0,
-    'Medium': 75.0,
-    'Large': 90.0,
-    'XLarge': 105.0,
-    'Custom': 120.0,
+    'Small': 40.0,
+    'Medium': 50.0,
+    'Large': 60.0,
+    'XLarge': 70.0,
+    'Custom': 80.0,
   };
 
   final Map<String, double> sizeToPrice = {
@@ -64,11 +64,16 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
   };
 
   void fillUpCup() {
+    loadSFX();
+    pouring.setVolume(1.0);
+    pouring.setLoopMode(LoopMode.all);
+    pouring.play();
     setState(() {
       filling = true;
       _progress = 0.0;
       _timer?.cancel();
       _timer = Timer.periodic(Duration(milliseconds: 10), (timer) {
+        pouring.setVolume(1 - _progress);
         setState(() {
           _progress += 1/cupSize/5;
           if (_progress >= 1.0) {
@@ -76,6 +81,8 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
             timer.cancel();
             filling = false;
             filled = true;
+            pouring.stop();
+            pouring.dispose();
           }
         });
       });
@@ -83,6 +90,8 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
   }
 
   void addToOrder() {
+    swoosh.setVolume(1);
+    swoosh.play();
     setState(() {
       filling = false;
       filled = false;
@@ -186,7 +195,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
                   ),
                 ) : const SizedBox(),
                 Positioned(
-                  bottom: 185,
+                  bottom: 179,
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 400),
                     curve: Curves.easeInOut,
