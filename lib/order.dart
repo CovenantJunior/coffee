@@ -69,6 +69,13 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
         });
       });
     });
+    Future.delayed(const Duration(seconds: 1), () async {
+      dropletController.forward(from: 0.0);
+      drip = AudioPlayer();
+      await drip.setAsset('sfx/drip.mp3');
+      drip.setVolume(1.0);
+      drip.play();
+    });
   }
 
   void addToOrder() async{
@@ -201,7 +208,9 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
                     color: Colors.brown,
                     size: 10,
                   ),
-                ).animate().slideY(
+                ).animate(
+                  controller: dropletController,
+                ).slideY(
                   begin: 0.5,
                   end: 0.0,
                   duration: const Duration(milliseconds: 500),
