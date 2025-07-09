@@ -20,6 +20,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
   bool filling = false;
   bool filled = false;
   bool ordering = false;
+  bool showDrip = false;
   double _progress = 0.0;
   Timer? _timer;
   late AudioPlayer clink;
@@ -46,14 +47,19 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
     'Custom': 6.50,
   };
 
+
   void dripSound() async {
-    Future.delayed(const Duration(seconds: 1), () async {
-      dropletController.forward(from: 0.0);
-      drip = AudioPlayer();
-      await drip.setAsset('sfx/drip.mp3');
-      await drip.setVolume(1.0);
-      await drip.play();
-      filling = false;
+    await Future.delayed(const Duration(milliseconds: 2000));
+    setState(() {
+      showDrip = true;
+    });
+    drip = AudioPlayer();
+    await drip.setAsset('sfx/drip.mp3');
+    await drip.setVolume(1.0);
+    await drip.play();
+    dropletController.forward(from: 0.0);
+    setState(() {
+      showDrip = false;
       filled = true;
     });
   }
@@ -67,14 +73,16 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
       filling = true;
       _progress = 0.0;
       _timer?.cancel();
-      _timer = Timer.periodic(Duration(milliseconds: 10), (timer) {
+      _timer = Timer.periodic(const Duration(milliseconds: 10), (timer) {
         pouring.setVolume(1 - _progress);
         setState(() {
-          _progress += 1/cupSize/5;
+          _progress += 1 / cupSize / 5;
           if (_progress >= 1.0) {
             _progress = 1.0;
             timer.cancel();
             pouring.stop();
+            filling = false;
+            filled = false;
             dripSound();
           }
         });
@@ -205,7 +213,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
                     ),
                   ),
                 ) : const SizedBox(),
-                filling? Positioned(
+                showDrip? Positioned(
                   bottom: 200,
                   child: Icon(
                     Icons.water_drop,
@@ -231,6 +239,13 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
                       itemCount: 3,
                       controller: PageController(viewportFraction: 0.7),
                       physics: filling ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
+                      onPageChanged: (index) async {
+                        if (filling) return;
+                        slide = AudioPlayer();
+                        await slide.setAsset('sfx/slide.mp3'); 
+                        await slide.setVolume(1);
+                        await slide.play();
+                      },
                       itemBuilder: (context, index) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4.0),
