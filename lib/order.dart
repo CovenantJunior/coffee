@@ -13,11 +13,12 @@ class CoffeeOrderScreen extends StatefulWidget {
 
 class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
   String selectedSize = 'Large';
-  double cupSize = 60.0;
+  double cupSize = 70.0;
   int quantity = 1;
   int orders = 0;
   bool filling = false;
   bool filled = false;
+  bool ordering = false;
   double _progress = 0.0;
   Timer? _timer;
   late AudioPlayer clink;
@@ -50,9 +51,9 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
   final Map<String, double> sizeToCupSize = {
     'Small': 40.0,
     'Medium': 50.0,
-    'Large': 60.0,
-    'XLarge': 70.0,
-    'Custom': 80.0,
+    'Large': 70.0,
+    'XLarge': 80.0,
+    'Custom': 90.0,
   };
 
   final Map<String, double> sizeToPrice = {
@@ -63,10 +64,9 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
     'Custom': 6.50,
   };
 
-  void fillUpCup() {
-    loadSFX();
+  void fillUpCup() async {
+    await loadSFX();
     pouring.setVolume(1.0);
-    pouring.setLoopMode(LoopMode.all);
     pouring.play();
     setState(() {
       filling = true;
@@ -82,21 +82,28 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
             filling = false;
             filled = true;
             pouring.stop();
-            pouring.dispose();
           }
         });
       });
     });
   }
 
-  void addToOrder() {
-    swoosh.setVolume(1);
-    swoosh.play();
+  void addToOrder() async{
+    setState(() {
+      ordering = true;
+    });
+    await loadSFX();
+    await swoosh.setVolume(1);
+    await swoosh.play();
     setState(() {
       filling = false;
       filled = false;
       _progress = 0.0;
       orders +=1;
+    });
+    await swoosh.play();
+    setState(() {
+      ordering = false;
     });
   }
 
@@ -195,7 +202,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
                   ),
                 ) : const SizedBox(),
                 Positioned(
-                  bottom: 179,
+                  bottom: 185,
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 400),
                     curve: Curves.easeInOut,
@@ -344,6 +351,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
                         ),
                       ) : ElevatedButton(
                         onPressed: () {
+                          if (ordering) return;
                           addToOrder();
                         },
                         style: ElevatedButton.styleFrom(
@@ -353,13 +361,20 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text(
+                        child: !ordering ? const Text(
                           'Add to order',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Quicksand',
                             color: Colors.white,
+                          ),
+                        ) : SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: const CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.0,
                           ),
                         ),
                       ),
