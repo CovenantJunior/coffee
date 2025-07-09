@@ -46,6 +46,16 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
     'Custom': 6.50,
   };
 
+  void dripSound() async {
+    Future.delayed(const Duration(seconds: 1), () async {
+      dropletController.forward(from: 0.0);
+      drip = AudioPlayer();
+      await drip.setAsset('sfx/drip.mp3');
+      drip.setVolume(1.0);
+      drip.play();
+    });
+  }
+
   void fillUpCup() async {
     pouring = AudioPlayer();
     await pouring.setAsset('sfx/pouring.mp3');
@@ -65,16 +75,10 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
             filling = false;
             filled = true;
             pouring.stop();
+            dripSound();
           }
         });
       });
-    });
-    Future.delayed(const Duration(seconds: 1), () async {
-      dropletController.forward(from: 0.0);
-      drip = AudioPlayer();
-      await drip.setAsset('sfx/drip.mp3');
-      drip.setVolume(1.0);
-      drip.play();
     });
   }
 
