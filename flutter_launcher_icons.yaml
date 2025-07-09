@@ -1,0 +1,33 @@
+# flutter pub run flutter_launcher_icons
+# dart run flutter_launcher_icons
+flutter_launcher_icons:
+  image_path: "images/launcher.png"
+
+  android: "launcher_icon"
+  image_path_android: "images/launcher.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  adaptive_icon_background: "#8B4513" # Use a solid color for background to avoid transparency issues
+  adaptive_icon_foreground: "images/launcher.png"
+  adaptive_icon_monochrome: "images/launcher.png"
+
+  ios: true
+  image_path_ios: "images/launcher.png"
+  remove_alpha_channel_ios: true
+  image_path_ios_dark_transparent: "images/launcher.png"
+  image_path_ios_tinted_grayscale: "images/launcher.png"
+  desaturate_tinted_to_grayscale_ios: true
+
+  web:
+    generate: true
+    image_path: "images/launcher.png"
+    background_color: "#8B4513"
+    theme_color: "#8B4513"
+
+  windows:
+    generate: true
+    image_path: "images/launcher.png"
+    icon_size: 48 # min:48, max:256, default: 48
+
+  macos:
+    generate: true
+    image_path: "images/launcher.png"
