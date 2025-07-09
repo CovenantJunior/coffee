@@ -10,28 +10,57 @@ class Splash extends StatefulWidget {
   State<Splash> createState() => _SplashState();
 }
 
-class _SplashState extends State<Splash> {
+class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
+
+  late AnimationController lottieController;
+  late Animation<double> lottieFadeAnimation;
+  
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the Lottie controller
+    lottieController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3)
+    );
+    lottieFadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: lottieController,
+        curve: const Interval(0.7, 1.0, curve: Curves.easeOut),
+      ),
+    );
+
+    Future.delayed(const Duration(milliseconds: 500), () {
+      lottieController.forward().whenComplete(() {
+        Transition().navigatePushReplacement(context, const CoffeeOrderScreen());
+      });
+    });
+  }
+  
+  @override
+  void dispose() {
+    super.dispose();
+    lottieController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: LottieBuilder.asset(
-        'lottie/splash.json',
-        width: 200,
-        height: 200,
-        fit: BoxFit.fill,
-        onLoaded: (composition) {
-          final controller = AnimationController(
-            vsync: NavigatorState(),
-            duration: composition.duration,
-          );
-          controller.addStatusListener((status) {
-            if (status == AnimationStatus.completed) {
-              Transition().navigatePushReplacement(context, const CoffeeOrderScreen());
-            }
-          });
-          controller.forward();
-        },
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(
+        child: FadeTransition(
+          opacity: lottieFadeAnimation,
+          child: Lottie.asset(
+            'lotties/splash.json',
+            height: 200,
+            controller: lottieController,
+            fit: BoxFit.cover,
+            filterQuality: FilterQuality.low,
+            onLoaded: (composition) {
+              lottieController.duration = composition.duration;
+            },
+          ),
+        ),
       ),
     );
   }

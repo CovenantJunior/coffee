@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:liquid_progress_indicator_v2/liquid_progress_indicator.dart';
 import 'package:lottie/lottie.dart';
 
@@ -19,6 +20,32 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
   bool filled = false;
   double _progress = 0.0;
   Timer? _timer;
+  late AudioPlayer clink;
+  late AudioPlayer drip;
+  late AudioPlayer pouring;
+  late AudioPlayer slide;
+  late AudioPlayer swoosh;
+
+  Future<void> loadSFX() async {
+    clink = AudioPlayer();
+    drip = AudioPlayer();
+    pouring = AudioPlayer();
+    slide = AudioPlayer();
+    swoosh = AudioPlayer();
+
+    await clink.setAsset('sfx/clink.mp3');
+    await drip.setAsset('sfx/drip.mp3');
+    await pouring.setAsset('sfx/pouring.mp3');
+    await slide.setAsset('sfx/slide.mp3');
+    await swoosh.setAsset('sfx/swoosh.mp3');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadSFX();
+  }
+
 
   final Map<String, double> sizeToCupSize = {
     'Small': 60.0,
@@ -341,6 +368,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
     bool isSelected = selectedSize == size;
     return GestureDetector(
       onTap: () {
+        clink.play();
         if (filling) return;
         setState(() {
           selectedSize = size;
