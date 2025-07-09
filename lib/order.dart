@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:liquid_progress_indicator_v2/liquid_progress_indicator.dart';
 import 'package:lottie/lottie.dart';
@@ -11,7 +12,7 @@ class CoffeeOrderScreen extends StatefulWidget {
   _CoffeeOrderScreenState createState() => _CoffeeOrderScreenState();
 }
 
-class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
+class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProviderStateMixin {
   String selectedSize = 'Large';
   double cupSize = 70.0;
   int quantity = 1;
@@ -27,26 +28,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
   late AudioPlayer slide;
   late AudioPlayer swoosh;
 
-  Future<void> loadSFX() async {
-    clink = AudioPlayer();
-    drip = AudioPlayer();
-    pouring = AudioPlayer();
-    slide = AudioPlayer();
-    swoosh = AudioPlayer();
-
-    await clink.setAsset('sfx/clink.mp3');
-    await drip.setAsset('sfx/drip.mp3');
-    await pouring.setAsset('sfx/pouring.mp3');
-    await slide.setAsset('sfx/slide.mp3');
-    await swoosh.setAsset('sfx/swoosh.mp3');
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    loadSFX();
-  }
-
+  late AnimationController dropletController;
 
   final Map<String, double> sizeToCupSize = {
     'Small': 40.0,
@@ -65,7 +47,8 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
   };
 
   void fillUpCup() async {
-    await loadSFX();
+    pouring = AudioPlayer();
+    await pouring.setAsset('sfx/pouring.mp3');
     pouring.setVolume(1.0);
     pouring.play();
     setState(() {
@@ -92,7 +75,8 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
     setState(() {
       ordering = true;
     });
-    await loadSFX();
+    swoosh = AudioPlayer();
+    await swoosh.setAsset('sfx/swoosh.mp3');
     await swoosh.setVolume(1);
     await swoosh.play();
     setState(() {
@@ -105,6 +89,15 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
     setState(() {
       ordering = false;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    dropletController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
   }
 
   @override
@@ -201,6 +194,19 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
                     ),
                   ),
                 ) : const SizedBox(),
+                Positioned(
+                  bottom: 260,
+                  child: Icon(
+                    Icons.water_drop,
+                    color: Colors.brown,
+                    size: 10,
+                  ),
+                ).animate().slideY(
+                  begin: 0.5,
+                  end: 0.0,
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeInOut,
+                ),
                 Positioned(
                   bottom: 185,
                   child: AnimatedContainer(
@@ -310,6 +316,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
                     child: !filling && !filled
                         ? ElevatedButton(
                             onPressed: () {
+                            if (filling || filled) return;
                               fillUpCup();
                             },
                             style: ElevatedButton.styleFrom(
@@ -391,8 +398,11 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> {
   Widget _buildSizeButton(String size) {
     bool isSelected = selectedSize == size;
     return GestureDetector(
-      onTap: () {
-        clink.play();
+      onTap: () async {
+        clink = AudioPlayer();
+        await clink.setAsset('sfx/clink.mp3');
+        await clink.setVolume(1);
+        await clink.play();
         if (filling) return;
         setState(() {
           selectedSize = size;
