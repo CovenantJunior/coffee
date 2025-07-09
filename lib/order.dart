@@ -51,8 +51,10 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
       dropletController.forward(from: 0.0);
       drip = AudioPlayer();
       await drip.setAsset('sfx/drip.mp3');
-      drip.setVolume(1.0);
-      drip.play();
+      await drip.setVolume(1.0);
+      await drip.play();
+      filling = false;
+      filled = true;
     });
   }
 
@@ -72,8 +74,6 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
           if (_progress >= 1.0) {
             _progress = 1.0;
             timer.cancel();
-            filling = false;
-            filled = true;
             pouring.stop();
             dripSound();
           }
@@ -205,21 +205,21 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
                     ),
                   ),
                 ) : const SizedBox(),
-                Positioned(
-                  bottom: 260,
+                filling? Positioned(
+                  bottom: 200,
                   child: Icon(
                     Icons.water_drop,
-                    color: Colors.brown,
+                    color: Colors.blueGrey,
                     size: 10,
                   ),
                 ).animate(
                   controller: dropletController,
                 ).slideY(
-                  begin: 0.5,
+                  begin: -5.5,
                   end: 0.0,
                   duration: const Duration(milliseconds: 500),
                   curve: Curves.easeInOut,
-                ),
+                ) : const SizedBox(),
                 Positioned(
                   bottom: 185,
                   child: AnimatedContainer(
@@ -230,14 +230,15 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
                     child: PageView.builder(
                       itemCount: 3,
                       controller: PageController(viewportFraction: 0.7),
+                      physics: filling ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
                       itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                          child: Image.asset(
-                            'images/cup${index + 1}.png',
-                            height: 80,
-                          ),
-                        );
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        child: Image.asset(
+                        'images/cup${index + 1}.png',
+                        height: 80,
+                        ),
+                      );
                       },
                     ),
                   ),
