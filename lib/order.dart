@@ -94,6 +94,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
   void addToOrder() async{
     setState(() {
       ordering = true;
+      quantity = 1;
     });
     swoosh = AudioPlayer();
     await swoosh.setAsset('sfx/swoosh.mp3');
