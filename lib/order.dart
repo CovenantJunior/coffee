@@ -49,7 +49,8 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
 
 
   void dripSound() async {
-    await Future.delayed(const Duration(milliseconds: 2000));
+    final random = (2000 + (3000 * (DateTime.now().millisecondsSinceEpoch % 1000) / 1000)).toInt();
+    await Future.delayed(Duration(milliseconds: random));
     setState(() {
       showDrip = true;
     });
@@ -223,7 +224,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
                 ).animate(
                   controller: dropletController,
                 ).slideY(
-                  begin: -5.5,
+                  begin: -7,
                   end: 0.0,
                   duration: const Duration(milliseconds: 500),
                   curve: Curves.easeInOut,
