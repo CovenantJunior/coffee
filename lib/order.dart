@@ -30,6 +30,11 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
   late AudioPlayer slide;
   late AudioPlayer swoosh;
 
+  bool showFlyingCup = false;
+  late AnimationController cupFlyController;
+  late Animation<Offset> cupOffsetAnimation;
+  late Animation<double> cupScaleAnimation;
+
   late AnimationController dropletController;
 
   final Map<String, double> sizeToCupSize = {
@@ -47,7 +52,6 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
     'XLarge': 5.75,
     'Custom': 6.50,
   };
-
 
   void dripSound() async {
     final random = (2000 + (3000 * (DateTime.now().millisecondsSinceEpoch % 1000) / 1000)).toInt();
@@ -96,22 +100,29 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
     });
   }
 
-  void addToOrder() async{
+  void addToOrder() async {
     setState(() {
       ordering = true;
       quantity = 1;
+      showFlyingCup = true;
     });
+
+    await cupFlyController.forward(from: 0.0);
+
     swoosh = AudioPlayer();
     await swoosh.setAsset('sfx/swoosh.mp3');
     await swoosh.setVolume(1);
     await swoosh.play();
+
     setState(() {
       filling = false;
       filled = false;
       _progress = 0.0;
-      orders +=1;
+      orders += 1;
+      showFlyingCup = false;
     });
-    await swoosh.play();
+
+    await Future.delayed(const Duration(milliseconds: 200));
     setState(() {
       ordering = false;
     });
@@ -124,11 +135,33 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
+
+    cupFlyController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    cupOffsetAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(1.8, -3.0), // adjust for direction to badge
+    ).animate(CurvedAnimation(
+      parent: cupFlyController,
+      curve: Curves.easeInOut,
+    ));
+
+    cupScaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.2,
+    ).animate(CurvedAnimation(
+      parent: cupFlyController,
+      curve: Curves.easeInOut,
+    ));
   }
 
   @override
   void dispose() {
     _timer?.cancel();
+    cupFlyController.dispose();
     super.dispose();
   }
 
@@ -149,10 +182,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
         ),
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_rounded,
-            size: 20,
-          ),
+          icon: const Icon(Icons.arrow_back_ios_rounded, size: 20),
           onPressed: () {},
         ),
         actions: [
@@ -162,37 +192,39 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
                 icon: const Icon(Icons.coffee_outlined),
                 onPressed: () {},
               ),
-              orders > 0 ? Positioned(
-                right: 10,
-                top: 3,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.brown, // Red background for the badge
-                    shape: BoxShape.circle,
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 16,
-                    minHeight: 16,
-                  ),
-                  child: Text(
-                    orders.toString(),
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontFamily: 'Quicksand',
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                )
-              ).animate().scale(
-                begin: const Offset(2.0, 2.0),
-                end: const Offset(1.0, 1.0),
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              ) : const SizedBox()
-            ]
+              orders > 0
+                  ? Positioned(
+                      right: 10,
+                      top: 3,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.brown,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          orders.toString(),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontFamily: 'Quicksand',
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ).animate().scale(
+                      begin: const Offset(2.0, 2.0),
+                      end: const Offset(1.0, 1.0),
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    )
+                  : const SizedBox()
+            ],
           ),
         ],
       ),
@@ -200,64 +232,50 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
         padding: const EdgeInsets.all(10.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
             Stack(
               alignment: Alignment.center,
               children: [
-                Center(
-                  child: Image.asset(
-                    'images/coffee_machine.png',
-                    height: 500,
-                  ),
-                ),
-                on ? Positioned(
-                  bottom: 350,
-                  child: Row(
-                    children: [
-                      Image.asset(
-                        'images/indicator.png',
-                        height: 70,
-                      ),
-                      SizedBox(
-                        width: 33,
-                      ),
-                      Image.asset(
-                        'images/indicator.png',
-                        height: 70,
-                      )
-                    ]
-                  ),
-                ) : const SizedBox(),
-                filling ? Positioned(
-                  bottom: 240,
-                  child: Transform.rotate(
-                    angle: -270 * 3.14159 / 180,
-                    child: LottieBuilder.asset(
-                      'lotties/faucet.json',
-                      height: 3,
-                      // width: 20,
-                      repeat: true,
-                      animate: true,
+                Center(child: Image.asset('images/coffee_machine.png', height: 500)),
+                if (on)
+                  Positioned(
+                    bottom: 350,
+                    child: Row(
+                      children: [
+                        Image.asset('images/indicator.png', height: 70),
+                        const SizedBox(width: 33),
+                        Image.asset('images/indicator.png', height: 70),
+                      ],
                     ),
                   ),
-                ) : const SizedBox(),
-                showDrip? Positioned(
-                  bottom: 200,
-                  child: Icon(
-                    Icons.water_drop,
-                    color: Colors.blueGrey,
-                    size: 10,
+                if (filling)
+                  Positioned(
+                    bottom: 240,
+                    child: Transform.rotate(
+                      angle: -270 * 3.14159 / 180,
+                      child: LottieBuilder.asset(
+                        'lotties/faucet.json',
+                        height: 3,
+                        repeat: true,
+                        animate: true,
+                      ),
+                    ),
                   ),
-                ).animate(
-                  controller: dropletController,
-                ).slideY(
-                  begin: -7,
-                  end: 0.0,
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.easeInOut,
-                ) : const SizedBox(),
+                if (showDrip)
+                  Positioned(
+                    bottom: 200,
+                    child: Icon(
+                      Icons.water_drop,
+                      color: Colors.blueGrey,
+                      size: 10,
+                    ),
+                  ).animate(controller: dropletController).slideY(
+                        begin: -7,
+                        end: 0.0,
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
+                      ),
                 Positioned(
                   bottom: 185,
                   child: AnimatedContainer(
@@ -270,53 +288,47 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
                       controller: PageController(viewportFraction: 0.7),
                       physics: filling ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
                       itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                        child: Image.asset(
-                        'images/cup${index + 1}.png',
-                        height: 80,
-                        ),
-                      );
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: Image.asset('images/cup${index + 1}.png', height: 80),
+                        );
                       },
                     ),
                   ),
                 ),
+                if (showFlyingCup)
+                  Positioned(
+                    bottom: 185,
+                    left: MediaQuery.of(context).size.width / 2 - cupSize / 2,
+                    child: SlideTransition(
+                      position: cupOffsetAnimation,
+                      child: ScaleTransition(
+                        scale: cupScaleAnimation,
+                        child: Image.asset(
+                          'images/cup1.png',
+                          height: cupSize,
+                          width: cupSize,
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
-            const SizedBox(height: 20),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 0),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                      'Size Options',
-                      style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Quicksand'
-                    )
-                  ),
+                  const Text('Size Options',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Quicksand')),
                   RichText(
                     text: TextSpan(
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Quicksand',
-                        color: Colors.black,
-                      ),
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Quicksand', color: Colors.black),
                       children: [
+                        TextSpan(text: '\$${sizeToPrice[selectedSize]!.floor()}'),
                         TextSpan(
-                          text: '\$${sizeToPrice[selectedSize]!.floor()}',
-                        ),
-                        TextSpan(
-                          text:
-                              '.${(sizeToPrice[selectedSize]! % 1).toStringAsFixed(2).substring(2)}',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Quicksand',
-                          ),
+                          text: '.${(sizeToPrice[selectedSize]! % 1).toStringAsFixed(2).substring(2)}',
+                          style: const TextStyle(fontSize: 14),
                         ),
                       ],
                     ),
@@ -324,119 +336,84 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
                 ],
               ),
             ),
-            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildSizeButton('Small'),
-                _buildSizeButton('Medium'),
-                _buildSizeButton('Large'),
-                _buildSizeButton('XLarge'),
-                _buildSizeButton('Custom'),
-              ],
+              children: ['Small', 'Medium', 'Large', 'XLarge', 'Custom']
+                  .map((size) => _buildSizeButton(size))
+                  .toList(),
             ),
-            const SizedBox(height: 20),
             Row(
               children: [
                 IconButton(
                   icon: const Icon(Icons.delete_outline),
-                  onPressed: () {
-                    setState(() {
-                      quantity = 1;
-                    });
-                  },
+                  onPressed: () => setState(() => quantity = 1),
                 ),
-                Text(
-                  '$quantity',
-                  style: const TextStyle(
-                      fontSize: 18,
-                      fontFamily: 'Quicksand',
-                      fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () {
-                    setState(() {
-                      quantity++;
-                    });
-                  },
-                ),
+                Text('$quantity',
+                    style: const TextStyle(fontSize: 18, fontFamily: 'Quicksand', fontWeight: FontWeight.bold)),
+                IconButton(icon: const Icon(Icons.add), onPressed: () => setState(() => quantity++)),
                 Expanded(
                   child: SizedBox(
                     height: 60,
-                    width: 50,
                     child: !filling && !filled
                         ? ElevatedButton(
                             onPressed: () {
-                            if (filling || filled || on) return;
+                              if (filling || filled || on) return;
                               fillUpCup();
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.brown,
-                              minimumSize: const Size(double.infinity, 50),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
-                            child: const Text(
-                              'Tap to fill',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Quicksand',
-                                color: Colors.white,
-                              ),
-                            ),
+                            child: const Text('Tap to fill',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Quicksand',
+                                  color: Colors.white,
+                                )),
                           )
-                        : !filled ? LiquidLinearProgressIndicator(
-                        value: _progress,
-                        valueColor: const AlwaysStoppedAnimation(Colors.brown),
-                        backgroundColor: Colors.white,
-                        borderColor: Colors.brown,
-                        borderWidth: 5.0,
-                        borderRadius: 12.0,
-                        direction: Axis.horizontal,
-                        center: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: const Text(
-                            "Filling your cup",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Quicksand',
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ) : ElevatedButton(
-                        onPressed: () {
-                          if (ordering) return;
-                          addToOrder();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.brown,
-                          minimumSize: const Size(double.infinity, 50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: !ordering ? const Text(
-                          'Add to order',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Quicksand',
-                            color: Colors.white,
-                          ),
-                        ) : SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: const CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2.0,
-                          ),
-                        ),
-                      ),
+                        : !filled
+                            ? LiquidLinearProgressIndicator(
+                                value: _progress,
+                                valueColor: const AlwaysStoppedAnimation(Colors.brown),
+                                backgroundColor: Colors.white,
+                                borderColor: Colors.brown,
+                                borderWidth: 5.0,
+                                borderRadius: 12.0,
+                                direction: Axis.horizontal,
+                                center: const Padding(
+                                  padding: EdgeInsets.all(10.0),
+                                  child: Text("Filling your cup",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Quicksand',
+                                          color: Colors.white)),
+                                ),
+                              )
+                            : ElevatedButton(
+                                onPressed: ordering ? null : addToOrder,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.brown,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                                child: ordering
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2.0,
+                                        ),
+                                      )
+                                    : const Text('Add to order',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Quicksand',
+                                          color: Colors.white,
+                                        )),
+                              ),
                   ),
                 ),
               ],
@@ -465,16 +442,11 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
         children: [
           Container(
             decoration: BoxDecoration(
-              color: isSelected
-                  ? Colors.brown.withOpacity(0.3)
-                  : Colors.grey.withOpacity(0.1),
+              color: isSelected ? Colors.brown.withOpacity(0.3) : Colors.grey.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             padding: const EdgeInsets.all(8.0),
-            child: Icon(
-              Icons.local_drink,
-              color: isSelected ? Colors.brown : Colors.black54,
-            ),
+            child: Icon(Icons.local_drink, color: isSelected ? Colors.brown : Colors.black54),
           ),
           const SizedBox(height: 5),
           Text(
