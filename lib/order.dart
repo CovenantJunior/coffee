@@ -269,13 +269,6 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
                       itemCount: 3,
                       controller: PageController(viewportFraction: 0.7),
                       physics: filling ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
-                      onPageChanged: (index) async {
-                        if (filling) return;
-                        slide = AudioPlayer();
-                        await slide.setAsset('sfx/slide.mp3'); 
-                        await slide.setVolume(1);
-                        await slide.play();
-                      },
                       itemBuilder: (context, index) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4.0),
