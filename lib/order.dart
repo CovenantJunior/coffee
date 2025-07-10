@@ -17,6 +17,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
   double cupSize = 70.0;
   int quantity = 1;
   int orders = 0;
+  bool on = false;
   bool filling = false;
   bool filled = false;
   bool ordering = false;
@@ -62,10 +63,14 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
     setState(() {
       showDrip = false;
       filled = true;
+      on = false;
     });
   }
 
   void fillUpCup() async {
+    setState(() {
+      on = true;
+    });
     pouring = AudioPlayer();
     await pouring.setAsset('sfx/pouring.mp3');
     pouring.setVolume(1.0);
@@ -181,7 +186,12 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
                     ),
                   ),
                 )
-              ): const SizedBox()
+              ).animate().scale(
+                begin: const Offset(2.0, 2.0),
+                end: const Offset(1.0, 1.0),
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              ) : const SizedBox()
             ]
           ),
         ],
@@ -202,6 +212,24 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
                     height: 500,
                   ),
                 ),
+                on ? Positioned(
+                  bottom: 350,
+                  child: Row(
+                    children: [
+                      Image.asset(
+                        'images/indicator.png',
+                        height: 70,
+                      ),
+                      SizedBox(
+                        width: 33,
+                      ),
+                      Image.asset(
+                        'images/indicator.png',
+                        height: 70,
+                      )
+                    ]
+                  ),
+                ) : const SizedBox(),
                 filling ? Positioned(
                   bottom: 240,
                   child: Transform.rotate(
@@ -347,7 +375,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
                     child: !filling && !filled
                         ? ElevatedButton(
                             onPressed: () {
-                            if (filling || filled) return;
+                            if (filling || filled || on) return;
                               fillUpCup();
                             },
                             style: ElevatedButton.styleFrom(
