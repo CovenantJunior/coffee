@@ -1,16 +1,40 @@
-# coffee
+# ☕️ Caramel Frappuccino App
 
-A new Flutter project.
+A sleek and interactive Flutter coffee ordering app that simulates a real espresso machine. Choose your cup size, watch it fill with rich animation and sound, and send your order flying to the cart — literally!
 
-## Getting Started
+[View on GitHub →](https://github.com/CovenantJunior/coffee)
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## ✨ Features
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- 🎨 Modern UI with coffee machine visual
+- 📦 PageView cup selection
+- 💧 Liquid progress indicator while filling
+- 🔊 Sound effects
+- 📲 Tap-to-fill and tap-to-order interaction
+- 🛍️ Animated flying cup to order badge
+- ⚙️ Fully responsive layout
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## 📱 Screenshot
+
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Flutter SDK (>=3.x)
+- Dart
+- Android Studio or VS Code
+
+### Installation
+
+**Clone the repository:**
+
+```bash
+git clone https://github.com/CovenantJunior/coffee.git
+cd coffee
