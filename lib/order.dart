@@ -22,6 +22,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
   bool filled = false;
   bool ordering = false;
   bool showDrip = false;
+  int? selectedCup = 1;
   double _progress = 0.0;
   Timer? _timer;
   late AudioPlayer clink;
@@ -107,12 +108,12 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
       showFlyingCup = true;
     });
 
-    await cupFlyController.forward(from: 0.0);
-
     swoosh = AudioPlayer();
     await swoosh.setAsset('sfx/swoosh.mp3');
     await swoosh.setVolume(1);
     await swoosh.play();
+
+    await cupFlyController.forward(from: 0.0);
 
     setState(() {
       filling = false;
@@ -120,10 +121,6 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
       _progress = 0.0;
       orders += 1;
       showFlyingCup = false;
-    });
-
-    await Future.delayed(const Duration(milliseconds: 200));
-    setState(() {
       ordering = false;
     });
   }
@@ -138,12 +135,12 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
 
     cupFlyController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 300),
     );
 
     cupOffsetAnimation = Tween<Offset>(
       begin: Offset.zero,
-      end: const Offset(1.8, -3.0), // adjust for direction to badge
+      end: const Offset(5, -10.0),
     ).animate(CurvedAnimation(
       parent: cupFlyController,
       curve: Curves.easeInOut,
@@ -271,11 +268,11 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
                       size: 10,
                     ),
                   ).animate(controller: dropletController).slideY(
-                        begin: -7,
-                        end: 0.0,
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeInOut,
-                      ),
+                    begin: -7,
+                    end: 0.0,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
+                  ),
                 Positioned(
                   bottom: 185,
                   child: AnimatedContainer(
@@ -286,11 +283,17 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
                     child: PageView.builder(
                       itemCount: 3,
                       controller: PageController(viewportFraction: 0.7),
-                      physics: filling ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
+                      physics: filling || on ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
+                      onPageChanged: (index) {
+                        if (on) return;
+                        setState(() {
+                          selectedCup = index + 1;
+                        });
+                      },
                       itemBuilder: (context, index) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                          child: Image.asset('images/cup${index + 1}.png', height: 80),
+                          child: Image.asset('images/cup$selectedCup.png', height: 80),
                         );
                       },
                     ),
@@ -305,7 +308,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
                       child: ScaleTransition(
                         scale: cupScaleAnimation,
                         child: Image.asset(
-                          'images/cup1.png',
+                          'images/cup$selectedCup.png',
                           height: cupSize,
                           width: cupSize,
                         ),
