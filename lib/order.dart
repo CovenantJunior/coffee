@@ -297,7 +297,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
                     curve: Curves.easeInOut,
                   ),
                 Positioned(
-                  bottom: 185,
+                  bottom: 170,
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 400),
                     curve: Curves.easeInOut,
