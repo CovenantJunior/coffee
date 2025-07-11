@@ -73,7 +73,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
       filled = true;
       on = false;
     });
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 2000));
     await beep.play();
   }
 
@@ -237,20 +237,38 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
           children: [
             const SizedBox(height: 20),
             Stack(
-              alignment: Alignment.center,
+              alignment: Alignment.bottomCenter,
               children: [
-                Center(child: Image.asset('images/coffee_machine.png', height: 500)),
-                if (on)
-                  Positioned(
-                    bottom: 350,
-                    child: Row(
-                      children: [
-                        Image.asset('images/indicator.png', height: 70),
-                        const SizedBox(width: 33),
-                        Image.asset('images/indicator.png', height: 70),
-                      ],
+                Stack(
+                  alignment: Alignment.topCenter,
+                  clipBehavior: Clip.none,
+                  children: [
+                    Center(
+                      child: Image.asset('images/coffee_machine.png', height: 500)
                     ),
-                  ),
+                    if (!on)
+                      Positioned(
+                        bottom: MediaQuery.of(context).size.height * 0.325,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'images/indicator.png',
+                              height: MediaQuery.of(context).size.height * 0.07,
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.099,
+                            ),
+                            Image.asset(
+                              'images/indicator.png',
+                              height: MediaQuery.of(context).size.height * 0.07,
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+                
                 if (filling)
                   Positioned(
                     bottom: 240,
