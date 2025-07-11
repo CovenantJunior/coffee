@@ -73,7 +73,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
       filled = true;
       on = false;
     });
-    await Future.delayed(const Duration(milliseconds: 2000));
+    await Future.delayed(const Duration(milliseconds: 500));
     await beep.play();
   }
 
@@ -246,7 +246,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
                     Center(
                       child: Image.asset('images/coffee_machine.png', height: 500)
                     ),
-                    if (!on)
+                    if (on)
                       Positioned(
                         bottom: MediaQuery.of(context).size.height * 0.325, // please adjust as desired
                         child: Row(
@@ -306,7 +306,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
                     child: PageView.builder(
                       itemCount: 3,
                       controller: PageController(viewportFraction: 0.7),
-                      physics: filling || on ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
+                      physics: filling || on || filled ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
                       onPageChanged: (index) {
                         if (on) return;
                         setState(() {
@@ -454,11 +454,11 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
     bool isSelected = selectedSize == size;
     return GestureDetector(
       onTap: () async {
+        if (filling) return;
         clink = AudioPlayer();
         await clink.setAsset('sfx/clink.mp3');
         await clink.setVolume(1);
         await clink.play();
-        if (filling) return;
         setState(() {
           selectedSize = size;
           cupSize = sizeToCupSize[size]!;
