@@ -68,13 +68,13 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
     });
     await drip.play();
     dropletController.forward(from: 0.0);
+    await Future.delayed(const Duration(milliseconds: 500));
+    await beep.play();
     setState(() {
       showDrip = false;
       filled = true;
       on = false;
     });
-    await Future.delayed(const Duration(milliseconds: 500));
-    await beep.play();
   }
 
   void fillUpCup() async {
