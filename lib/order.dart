@@ -248,7 +248,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
                     ),
                     if (!on)
                       Positioned(
-                        bottom: MediaQuery.of(context).size.height * 0.325,
+                        bottom: MediaQuery.of(context).size.height * 0.325, // please adjust as desired
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
