@@ -28,7 +28,7 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
   late AudioPlayer clink;
   late AudioPlayer drip;
   late AudioPlayer pouring;
-  late AudioPlayer slide;
+  late AudioPlayer beep;
   late AudioPlayer swoosh;
 
   bool showFlyingCup = false;
@@ -55,14 +55,17 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
   };
 
   void dripSound() async {
+    drip = AudioPlayer();
+    await drip.setAsset('sfx/drip.mp3');
+    await drip.setVolume(1.0);
+    beep = AudioPlayer();
+    await beep.setAsset('sfx/beep.mp3');
+    await beep.setVolume(1.0);
     final random = (2000 + (3000 * (DateTime.now().millisecondsSinceEpoch % 1000) / 1000)).toInt();
     await Future.delayed(Duration(milliseconds: random));
     setState(() {
       showDrip = true;
     });
-    drip = AudioPlayer();
-    await drip.setAsset('sfx/drip.mp3');
-    await drip.setVolume(1.0);
     await drip.play();
     dropletController.forward(from: 0.0);
     setState(() {
@@ -70,6 +73,8 @@ class _CoffeeOrderScreenState extends State<CoffeeOrderScreen> with TickerProvid
       filled = true;
       on = false;
     });
+    await Future.delayed(const Duration(milliseconds: 500));
+    await beep.play();
   }
 
   void fillUpCup() async {
