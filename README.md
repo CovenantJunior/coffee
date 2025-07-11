@@ -19,6 +19,9 @@ A sleek and interactive Flutter coffee ordering app that simulates a real espres
 ---
 
 ## 📱 Screenshot
+![splash](https://github.com/user-attachments/assets/13b26d93-2975-478d-ae9f-aada237112c2)
+![screen](https://github.com/user-attachments/assets/3b1973fc-b8ea-444b-b8ac-d72dbba699e1)
+![pouring](https://github.com/user-attachments/assets/749b7c0c-fa4e-4aa8-983f-a52f86da3a18)
 
 
 ---
